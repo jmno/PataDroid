@@ -1,14 +1,12 @@
 package pt.pata.patadroid.pt.pata.patadroid.modelo;
 
-import java.sql.Date;
-
 /**
  * Created by Nicolau on 23/12/14.
  */
 public class Paciente {
     private int id;
     private String nome;
-    private Date dataNasc;
+    private String dataNasc;
     private String morada;
     private String cc;
     private String telefone;
@@ -30,11 +28,11 @@ public class Paciente {
         this.nome = nome;
     }
 
-    public Date getDataNasc() {
+    public String getDataNasc() {
         return dataNasc;
     }
 
-    public void setDataNasc(Date dataNasc) {
+    public void setDataNasc(String dataNasc) {
         this.dataNasc = dataNasc;
     }
 

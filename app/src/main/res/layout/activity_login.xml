@@ -16,18 +16,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editText_Login_Username"
+            android:inputType="text"
+            android:gravity="center_horizontal"
             android:hint="@string/username"
             android:ems="10"
-            android:textAlignment="center" />
+             />
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
+            android:gravity="center_horizontal"
+
             android:id="@+id/editText_Login_Password"
             android:hint="@string/password"
-            android:textAlignment="center" />
+            />
 
         <Button
             android:layout_width="fill_parent"

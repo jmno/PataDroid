@@ -9,5 +9,14 @@
     <string name="password">Password</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_pacientes">Pacientes</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="dados">Dados</string>
+    <string name="morada">Morada</string>
+    <string name="cc">CC</string>
+    <string name="telefone">Telefone</string>
+    <string name="episodioClinico">Episódio Clínico</string>
+    <string name="episodiosClinico">Episódios Clícnicos</string>
+
+
 
 </resources>

@@ -64,9 +64,10 @@ public class Login extends ActionBarActivity {
         @Override
         protected void onPreExecute() {
             ringProgressDialog = new ProgressDialog(Login.this);
-            ringProgressDialog.setIcon(R.drawable.ic_launcher);
-            ringProgressDialog.setTitle("Please wait...");
-            ringProgressDialog.setMessage("Loging in...");
+           // ringProgressDialog.setIcon(R.drawable.ic_launcher);
+           // ringProgressDialog.setProgressStyle(R.id.progress_circular);
+            //ringProgressDialog.setTitle("Please wait...");
+            //ringProgressDialog.setMessage("Loging in...");
 
             //ringProgressDialog = ProgressDialog.show(Login.this, "Please wait ...",	"Loging in...", true);
             ringProgressDialog.setCancelable(false);
@@ -97,8 +98,14 @@ public class Login extends ActionBarActivity {
                     startActivity(new Intent(getApplicationContext(),MainActivity.class));
                     Toast.makeText(getApplicationContext(), token, Toast.LENGTH_SHORT).show();
                 }
-            } else {
+                else{
+                    Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
+                    ringProgressDialog.dismiss();
 
+                }
+            } else {
+                Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
+                ringProgressDialog.dismiss();
             }
         }
     }
