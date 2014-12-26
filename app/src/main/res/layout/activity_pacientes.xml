@@ -4,11 +4,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="pt.pata.patadroid.Pacientes">
+    tools:context="pt.pata.patadroid.Pacientes"
+    android:background="#EEEEEE">
 
 
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/listView_Pacientes_list" />
+        android:id="@+id/listView_Pacientes_list"
+        android:background="#FFFFFF" />
 </RelativeLayout>

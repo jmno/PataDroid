@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import pt.pata.patadroid.webutils.WebServiceUtils;
 
 public class Login extends ActionBarActivity {
     ProgressDialog ringProgressDialog = null;
+
     EditText username;
     EditText password;
     @Override
@@ -40,13 +42,14 @@ public class Login extends ActionBarActivity {
                 new LogInWeb().execute(username.getText().toString().trim(),password.getText().toString().trim());
             }
         });
+
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
+       // getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -63,16 +66,15 @@ public class Login extends ActionBarActivity {
 
         @Override
         protected void onPreExecute() {
-            ringProgressDialog = new ProgressDialog(Login.this);
-           // ringProgressDialog.setIcon(R.drawable.ic_launcher);
-           // ringProgressDialog.setProgressStyle(R.id.progress_circular);
-            //ringProgressDialog.setTitle("Please wait...");
-            //ringProgressDialog.setMessage("Loging in...");
-
-            //ringProgressDialog = ProgressDialog.show(Login.this, "Please wait ...",	"Loging in...", true);
+            ringProgressDialog = new ProgressDialog(Login.this,R.style.NewDialog);
             ringProgressDialog.setCancelable(false);
 
-            ringProgressDialog.show();
+            //ringProgressDialog = ProgressDialog.show(Login.this, "Please wait ...",	"Loging in...", true);
+
+            //  ringProgressDialog.setCancelable(false);
+
+
+             ringProgressDialog.show();
         };
         @Override
         protected String doInBackground(String... params) {
@@ -92,6 +94,7 @@ public class Login extends ActionBarActivity {
         protected void onPostExecute(String token) {
             if (token != null) {
                 if (!token.isEmpty()) {
+
                     ringProgressDialog.dismiss();
                     token = token.replace("\"", "");
                     PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("token", token).commit();
@@ -102,10 +105,12 @@ public class Login extends ActionBarActivity {
                     Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
                     ringProgressDialog.dismiss();
 
+
                 }
             } else {
                 Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
-                ringProgressDialog.dismiss();
+               ringProgressDialog.dismiss();
+
             }
         }
     }

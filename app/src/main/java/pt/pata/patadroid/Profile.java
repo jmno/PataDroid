@@ -43,7 +43,6 @@ public class Profile extends ActionBarActivity {
         token = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 "token", "defaultStringIfNothingFound");
 
-       //FALTA DATA
         Gson g = new Gson();
         Bundle extras = getIntent().getExtras();
         paciente = new Paciente();
@@ -68,7 +67,7 @@ public class Profile extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        //getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
     }
 
