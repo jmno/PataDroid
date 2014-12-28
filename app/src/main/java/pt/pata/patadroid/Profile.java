@@ -1,5 +1,8 @@
 package pt.pata.patadroid;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,8 +10,10 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -18,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.EpisodioClinico;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
 import pt.pata.patadroid.webutils.RestClientException;
 import pt.pata.patadroid.webutils.WebServiceUtils;
@@ -36,6 +42,10 @@ public class Profile extends ActionBarActivity {
     private String token;
     private Bitmap imagemPaciente;
     private ArrayList<String> listaEpisodios;
+    private Gson g;
+    ProgressDialog ringProgressDialog = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +53,7 @@ public class Profile extends ActionBarActivity {
         token = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 "token", "defaultStringIfNothingFound");
 
-        Gson g = new Gson();
+        g = new Gson();
         Bundle extras = getIntent().getExtras();
         paciente = new Paciente();
         paciente = g.fromJson(extras.getString("paciente"),Paciente.class);
@@ -67,8 +77,8 @@ public class Profile extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_profile, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -78,12 +88,29 @@ public class Profile extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                Intent editPro = new Intent(getApplicationContext(),EditProfile.class);
+                editPro.putExtra("paciente",g.toJson(paciente,Paciente.class));
+                startActivity(editPro);
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                Bundle b = data.getExtras();
+                if (b != null) {
+                    paciente = (Paciente) b.getSerializable("paciente");
+                    new GetImage().execute(paciente.getId()+"");
+                }
+            } else if (resultCode == 0) {
+                System.out.println("RESULT CANCELLED");
+            }
+        }
     }
 
     public void preencherAtividade(Paciente p)
@@ -103,7 +130,10 @@ public class Profile extends ActionBarActivity {
 
         @Override
         protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(Profile.this,R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
 
+            ringProgressDialog.show();
         };
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -123,8 +153,48 @@ public class Profile extends ActionBarActivity {
         protected void onPostExecute(Bitmap imagem) {
             if (imagem != null) {
                 imagemPaciente = imagem;
-                preencherAtividade(paciente);
+                new GetEpisodiosClinicos().execute(token, paciente.getId() + "");
             } else {
+                new GetEpisodiosClinicos().execute(token, paciente.getId() + "");
+            }
+        }
+    }
+
+    private class GetEpisodiosClinicos extends AsyncTask<String, Void, ArrayList<EpisodioClinico>> {
+
+
+        @Override
+        protected void onPreExecute() {
+
+        };
+        @Override
+        protected ArrayList<EpisodioClinico> doInBackground(String... params) {
+            ArrayList<EpisodioClinico> lista = null;
+
+            try {
+                lista = WebServiceUtils.getEpisodiosClinicosByIDPaciente(params[0], params[1]);
+            } catch (IOException | RestClientException
+                    | JSONException e) {
+                e.printStackTrace();
+            }
+
+            return lista;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<EpisodioClinico> lista) {
+            if (lista != null && lista.size()>1) {
+                paciente.setListaEpisodios(lista);
+
+                ArrayAdapter<EpisodioClinico> adaptador = new ArrayAdapter<EpisodioClinico>(getApplicationContext(),R.layout.layout_lista_paciente,lista);
+                listViewEpisodios.setAdapter(adaptador);
+                preencherAtividade(paciente);
+                ringProgressDialog.dismiss();
+
+            } else {
+                Toast.makeText(getApplicationContext(),"Não Foram encontrados Episodios Clínicos para o Paciente" + paciente.getId(),Toast.LENGTH_LONG).show();
+                preencherAtividade(paciente);
+                ringProgressDialog.dismiss();
 
             }
         }

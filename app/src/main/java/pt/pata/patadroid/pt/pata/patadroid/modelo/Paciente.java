@@ -1,9 +1,15 @@
 package pt.pata.patadroid.pt.pata.patadroid.modelo;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /**
  * Created by Nicolau on 23/12/14.
  */
-public class Paciente {
+public class Paciente implements Serializable{
+
+    private static final long serialVersionUID = -7101605979273721440L;
+
     private int id;
     private String nome;
     private String dataNasc;
@@ -11,6 +17,15 @@ public class Paciente {
     private String cc;
     private String telefone;
     private int terapeutaID;
+    private ArrayList<EpisodioClinico> listaEpisodios;
+
+    public ArrayList<EpisodioClinico> getListaEpisodios() {
+        return listaEpisodios;
+    }
+
+    public void setListaEpisodios(ArrayList<EpisodioClinico> listaEpisodios) {
+        this.listaEpisodios = listaEpisodios;
+    }
 
     public int getId() {
         return id;
@@ -67,6 +82,8 @@ public class Paciente {
     public void setTerapeutaID(int terapeutaID) {
         this.terapeutaID = terapeutaID;
     }
+
+
 
     @Override
     public String toString() {

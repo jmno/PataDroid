@@ -11,12 +11,17 @@
     <string name="title_activity_pacientes">Pacientes</string>
     <string name="title_activity_profile">Profile</string>
     <string name="dados">Dados</string>
+    <string name="nome">Nome</string>
+    <string name="dataNasc">Data Nascimento</string>
     <string name="morada">Morada</string>
     <string name="cc">CC</string>
     <string name="telefone">Telefone</string>
     <string name="episodioClinico">Episódio Clínico</string>
     <string name="episodiosClinico">Episódios Clícnicos</string>
+    <string name="edit">Editar</string>
+    <string name="save">Guardar</string>
+    <string name="novoPaciente">Novo Paciente</string>
 
-
+    <string name="title_activity_edit_profile">EditProfile</string>
 
 </resources>

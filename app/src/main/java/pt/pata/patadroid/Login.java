@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -35,6 +34,7 @@ public class Login extends ActionBarActivity {
          username = (EditText) findViewById(R.id.editText_Login_Username);
          password = (EditText) findViewById(R.id.editText_Login_Password);
 
+
         Button btn_login = (Button) findViewById(R.id.button_Login_Login);
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,6 +42,9 @@ public class Login extends ActionBarActivity {
                 new LogInWeb().execute(username.getText().toString().trim(),password.getText().toString().trim());
             }
         });
+
+        String token = PreferenceManager.getDefaultSharedPreferences(this).getString("token", "defaultStringIfNothingFound");
+        new IsLoggedIN().execute(token);
 
     }
 
@@ -110,6 +113,54 @@ public class Login extends ActionBarActivity {
             } else {
                 Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
                ringProgressDialog.dismiss();
+
+            }
+        }
+    }
+
+    private class IsLoggedIN extends AsyncTask<String, Void, Boolean> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(Login.this,R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+
+        };
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Boolean resultado= false;
+
+            try {
+                resultado = WebServiceUtils.isLoggedIn(params[0]);
+            } catch ( IOException | RestClientException e) {
+                e.printStackTrace();
+            }
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado) {
+            if (resultado) {
+
+
+                // new Notifications(getApplicationContext(),
+                // "Connexão Efetuada com Sucesso!");
+
+                ringProgressDialog.dismiss();
+                Intent equipa = new Intent(getBaseContext(),
+                        MainActivity.class);
+                startActivity(equipa);
+            } else {
+                Toast.makeText(getApplicationContext(), "Sessão expirada!", Toast.LENGTH_SHORT).show();
+                PreferenceManager
+                        .getDefaultSharedPreferences(
+                                getApplicationContext())
+                        .edit().clear().commit();
+                ringProgressDialog.dismiss();
+
 
             }
         }
