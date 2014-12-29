@@ -135,10 +135,40 @@
                 <ListView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/listView2"
+                    android:id="@+id/listView_NovoEpisodio_listaDiagnosticos"
                     android:layout_above="@+id/textView2"
                     android:layout_alignParentBottom="true"
                     android:layout_alignBaseline="@+id/textView2" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tratamento"
+                    android:id="@+id/textView_NovoEpisodio_tratamento"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:textStyle="bold|italic"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_marginLeft="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:id="@+id/textView_NovoEpisodio_tratamentoString"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp" />
+
 
             </LinearLayout>
         </LinearLayout>

@@ -1,9 +1,7 @@
 package pt.pata.patadroid;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -12,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -68,7 +65,7 @@ public class Profile extends ActionBarActivity  {
         listViewEpisodios = (ListView) findViewById(R.id.listView_Profile_listaEpisodiosClinicos);
         imagemProfile = (CircleImageView) findViewById(R.id.profile_image);
 
-        new GetImage().execute(paciente.getId()+"");
+        new GetImage().execute(paciente.getSexo());
 
 
 
@@ -93,8 +90,9 @@ public class Profile extends ActionBarActivity  {
 
         switch (item.getItemId()) {
             case R.id.action_edit:
+                Gson g = new Gson();
                 Intent editPro = new Intent(getApplicationContext(),EditProfile.class);
-                editPro.putExtra("paciente",paciente);
+                editPro.putExtra("paciente",g.toJson(paciente,Paciente.class));
                 startActivityForResult(editPro,1);
             default:
                 return super.onOptionsItemSelected(item);
@@ -107,8 +105,8 @@ public class Profile extends ActionBarActivity  {
             if (resultCode == Activity.RESULT_OK) {
                 Bundle b = data.getExtras();
                 if (b != null) {
-                    paciente = (Paciente) b.getSerializable("paciente");
-                    new GetImage().execute(paciente.getId()+"");
+                    paciente = g.fromJson(b.getString("paciente"),Paciente.class);
+                    new GetImage().execute(paciente.getSexo());
                 }
             } else if (resultCode == 0) {
                 System.out.println("RESULT CANCELLED");
@@ -160,7 +158,7 @@ public class Profile extends ActionBarActivity  {
             Bitmap imagem = null;
 
             try {
-                imagem = WebServiceUtils.getImage(params[0]);
+                imagem = WebServiceUtils.getImage(params[0],paciente.getId()+"");
             } catch (IOException | RestClientException
                     | JSONException e) {
                 e.printStackTrace();

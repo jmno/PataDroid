@@ -1,6 +1,8 @@
 package pt.pata.patadroid;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -9,6 +11,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+
+import pt.pata.patadroid.webutils.RestClientException;
+import pt.pata.patadroid.webutils.WebServiceUtils;
+
 
 public class MainActivity extends ActionBarActivity {
     private String token;
@@ -16,6 +25,9 @@ public class MainActivity extends ActionBarActivity {
     TextView novoPaciente;
     TextView listaSintomas;
     TextView novoEpisodioClinico;
+    TextView logout;
+    ProgressDialog ringProgressDialog = null;
+
 
 
 
@@ -60,6 +72,14 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(),NovoEpisodioClinico.class));
             }});
+        logout = (TextView) findViewById(R.id.textView_Main_Logout);
+        logout.setClickable(true);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Logout().execute();
+            }
+        });
     }
 
 
@@ -89,6 +109,55 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+        // super.onBackPressed(); // optional depending on your needs
+    }
+
+    private class Logout extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(MainActivity.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String resultado ="";
+
+            try {
+
+                 WebServiceUtils.logout(token);
+                resultado = "s";
+            } catch (IOException | RestClientException
+                    | JSONException e) {
+                e.printStackTrace();
+            }
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            PreferenceManager
+                    .getDefaultSharedPreferences(
+                            getApplicationContext())
+                    .edit().clear().commit();
+            ringProgressDialog.dismiss();
+
+            finish();
+
+        }
+
+
+    }
 
 
 

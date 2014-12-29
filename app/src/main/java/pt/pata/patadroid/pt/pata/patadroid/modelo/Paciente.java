@@ -17,7 +17,16 @@ public class Paciente implements Serializable{
     private String cc;
     private String telefone;
     private int terapeutaID;
+    private String sexo;
     private ArrayList<EpisodioClinico> listaEpisodios;
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
+    }
 
     public ArrayList<EpisodioClinico> getListaEpisodios() {
         return listaEpisodios;

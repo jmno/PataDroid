@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.EpisodioClinico;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Sintoma;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.SistemaPericial;
 
 
 public class WebServiceUtils {
@@ -89,17 +90,22 @@ public class WebServiceUtils {
     }
 
 
-    public static Bitmap getImage(String id)
+    public static Bitmap getImage(String sexo, String idPaciente)
             throws ClientProtocolException, IOException, RestClientException, JSONException {
 
         Bitmap imagem = null;
 
         URL img_value = null;
-        img_value = new URL("http://www.nicolau.info/images/" + id + ".jpg");
-        try{imagem
-                = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());}
-        catch (Exception e)
-        {
+
+
+
+
+            img_value = new URL("http://www.nicolau.info/PATADroid/"+sexo+"/" + idPaciente + ".jpg");
+
+        try {
+            imagem
+                    = BitmapFactory.decodeStream(img_value.openConnection().getInputStream());
+        } catch (Exception e) {
             Log.i("error", e.getMessage().toString());
         }
         return imagem;
@@ -197,7 +203,7 @@ public class WebServiceUtils {
 
         HttpEntity entity = httpResponse.getEntity();
         String result = EntityUtils.toString(entity);
-        Log.i("error",result);
+        Log.i("error", result);
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
             //  HttpEntity entity = httpResponse.getEntity();
             // String string = EntityUtils.toString(entity);
@@ -207,7 +213,7 @@ public class WebServiceUtils {
             throw new RestClientException(
                     "HTTP Response with invalid status code "
                             + httpResponse.getStatusLine().getStatusCode()
-                           );
+            );
         }
 
         return resultado;
@@ -230,7 +236,7 @@ public class WebServiceUtils {
                 .execute(httpPost);
         HttpEntity entity = httpResponse.getEntity();
         String result = EntityUtils.toString(entity);
-        Log.i("error",result);
+        Log.i("error", result);
 
         if (httpResponse.getStatusLine().getStatusCode() == 200) {
 
@@ -277,6 +283,131 @@ public class WebServiceUtils {
         }
 
         return listaSintomas;
+    }
+
+    public static ArrayList<SistemaPericial> getSistemaPericial(String token, ArrayList<Sintoma> listaSintomas)
+            throws ClientProtocolException, IOException, RestClientException,
+            JSONException {
+
+        ArrayList<SistemaPericial> listaFinal = new ArrayList<SistemaPericial>();
+        HttpPost httpPost = new HttpPost(URL + "getListaSistemaPericial?token=" + token);
+        Gson g = new Gson();
+
+        Type collectionType = new TypeToken<ArrayList<Sintoma>>() {
+        }.getType();
+
+        StringEntity se = new StringEntity(g.toJson(listaSintomas, collectionType), "UTF-8");
+        se.setContentType("text/json");
+        se.setContentType("application/json;charset=UTF-8");
+
+        httpPost.setEntity(se);
+        HttpResponse httpResponse = client
+                .execute(httpPost);
+
+        HttpEntity entity = httpResponse.getEntity();
+        String result = EntityUtils.toString(entity);
+        Log.i("error", result);
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+            //  HttpEntity entity = httpResponse.getEntity();
+            // String string = EntityUtils.toString(entity);
+            collectionType = new TypeToken<ArrayList<SistemaPericial>>() {
+            }.getType();
+
+            listaFinal = g.fromJson(result,collectionType);
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + httpResponse.getStatusLine().getStatusCode()
+            );
+        }
+
+        return listaFinal;
+
+    }
+
+    public static Boolean addEpisodioClinico(String token, EpisodioClinico e)
+            throws ClientProtocolException, IOException, RestClientException,
+            JSONException {
+        Boolean resultado = false;
+
+        HttpPost httpPost = new HttpPost(URL + "addEpisodioClinico?token=" + token);
+        Gson g = new Gson();
+        StringEntity se = new StringEntity(g.toJson(e, EpisodioClinico.class), "UTF-8");
+        se.setContentType("text/json");
+        se.setContentType("application/json;charset=UTF-8");
+
+        httpPost.setEntity(se);
+        BasicHttpResponse httpResponse = (BasicHttpResponse) client
+                .execute(httpPost);
+        HttpEntity entity = httpResponse.getEntity();
+        String result = EntityUtils.toString(entity);
+        Log.i("error", result);
+
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+
+            resultado = Boolean.valueOf(result);
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + httpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+        return resultado;
+
+    }
+
+    public static void logout(String token)
+            throws ClientProtocolException, IOException, RestClientException,
+            JSONException {
+
+        HttpPost httpPost = new HttpPost(URL + "logout?token=" + token);
+
+        BasicHttpResponse httpResponse = (BasicHttpResponse) client
+                .execute(httpPost);
+        HttpEntity entity = httpResponse.getEntity();
+        String result = EntityUtils.toString(entity);
+        Log.i("error", result);
+
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + httpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+    }
+
+
+
+    public static Boolean isAdmin(String token)
+            throws ClientProtocolException, IOException, RestClientException {
+        Boolean resultado = false;
+        HttpGet request = new HttpGet(URL + "isAdmin?token=" + token);
+        // request.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
+        // "application/json"));
+        request.setHeader("Accept", "Application/JSON");
+        BasicHttpResponse basicHttpResponse = (BasicHttpResponse) client
+                .execute(request);
+
+
+        if (basicHttpResponse.getStatusLine().getStatusCode() == 200) {
+
+                    resultado = Boolean.parseBoolean(EntityUtils.toString(basicHttpResponse.getEntity()));
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + basicHttpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+        return resultado;
     }
     public static Boolean isOk(int statusCode) {
         Boolean resultado = false;

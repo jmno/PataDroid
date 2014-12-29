@@ -54,9 +54,6 @@ public class EpisodioClinico {
 
     @Override
     public String toString() {
-        return "EpisodioClinico{" +
-                "diagnostico='" + diagnostico + '\'' +
-                ", idPaciente=" + idPaciente +
-                '}';
+        return diagnostico + " - "+data ;
     }
 }

@@ -28,5 +28,15 @@
     <string name="novoEpisodioClinico">Novo Episódio Clínico</string>
     <string name="title_activity_novo_episodio_clinico">Novo Episodio Clínico</string>
     <string name="listaDiagnosticos">Lista Diagnósticos</string>
+    <string name="tratamento">Tratamento</string>
 
+    <string-array name="array_name">
+        <item>H</item>
+        <item>M</item>
+    </string-array>
+
+    <string-array name="sexoArray">
+        <item>M</item>
+        <item>H</item>
+    </string-array>
 </resources>

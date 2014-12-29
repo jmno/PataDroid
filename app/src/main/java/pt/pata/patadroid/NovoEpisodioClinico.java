@@ -27,17 +27,22 @@ import android.widget.Toast;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.EpisodioClinico;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Sintoma;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.SistemaPericial;
 import pt.pata.patadroid.webutils.RestClientException;
 import pt.pata.patadroid.webutils.WebServiceUtils;
 
 
-public class NovoEpisodioClinico extends ActionBarActivity{
+public class NovoEpisodioClinico extends ActionBarActivity {
     private String token;
     private ArrayAdapter<Paciente> adaptadorPacientes;
     private Dialog dialogPacientes;
@@ -49,6 +54,12 @@ public class NovoEpisodioClinico extends ActionBarActivity{
     private TextView textViewNome;
     private TextView textViewTelefone;
     private CircleImageView imagemProfile;
+    private Button btn_gerarDiagnosticos;
+    private TextView textView_NovoEpisodio_tratamento;
+    private ListView listaDiagnosticos;
+    private SistemaPericial diagnostico;
+    private String diagnosticoString = "";
+    private EpisodioClinico episodioClinico;
 
     private ImageView novoSintoma;
 
@@ -58,6 +69,7 @@ public class NovoEpisodioClinico extends ActionBarActivity{
     private ArrayList<Sintoma> listaSintomaDialog;
     private SintomaAdapter adaptadorDialogSintoma;
     private Button btn_okSintomas;
+    private ArrayList<Sintoma> listaSintomasEpisodioTemp;
 
 
     //Sintomas Escolhidos
@@ -66,7 +78,7 @@ public class NovoEpisodioClinico extends ActionBarActivity{
     private ArrayAdapter<Sintoma> adaptadorSintomasEpisodio;
     private ArrayList<Integer> selectedItemsIndexList;
     private boolean[] isSelectedArray;
-
+    private boolean[] isSelectedArrayTemp;
 
 
     @Override
@@ -80,7 +92,17 @@ public class NovoEpisodioClinico extends ActionBarActivity{
         imagemProfile = (CircleImageView) findViewById(R.id.profile_image_NovoEpisodio);
         listViewSintomasNovoEpisodioClinico = (ListView) findViewById(R.id.listView_NovoEpisodio_listaSintomas);
 
+        textView_NovoEpisodio_tratamento = (TextView) findViewById(R.id.textView_NovoEpisodio_tratamentoString);
+
         novoSintoma = (ImageView) findViewById(R.id.imageView_NovoEpisodio_novoSintoma);
+        btn_gerarDiagnosticos = (Button) findViewById(R.id.button_NovoEpisodio_btnGerarResultados);
+        btn_gerarDiagnosticos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textView_NovoEpisodio_tratamento.setText("");
+                new GetSistemaPericial().execute();
+            }
+        });
         listaSintomasEpisodio = new ArrayList<Sintoma>();
         novoSintoma.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +110,15 @@ public class NovoEpisodioClinico extends ActionBarActivity{
 
 
                 procuraSintomas();
+            }
+        });
+        listaDiagnosticos = (ListView) findViewById(R.id.listView_NovoEpisodio_listaDiagnosticos);
+        listaDiagnosticos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                diagnostico = (SistemaPericial) listaDiagnosticos.getAdapter().getItem(position);
+                textView_NovoEpisodio_tratamento.setText(diagnostico.getTratamento().toString());
+                diagnosticoString = diagnostico.getDiagnostico()+"|"+diagnostico.getTratamento();
             }
         });
 
@@ -116,27 +147,39 @@ public class NovoEpisodioClinico extends ActionBarActivity{
 
         switch (item.getItemId()) {
             case R.id.action_save:
+                if(!diagnosticoString.equals(""))
+                {
+                    episodioClinico = new EpisodioClinico();
+                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    Date date = new Date();
+
+                    episodioClinico.setData(dateFormat.format(date));
+                    episodioClinico.setDiagnostico(diagnosticoString);
+                    episodioClinico.setIdPaciente(paciente.getId());
+                    episodioClinico.setListaSintomas(listaSintomasEpisodio);
+                    new AddEpisodioClinico().execute();
+                }
+                else
+                Toast.makeText(getApplicationContext(),"Tem de selecionar um Diagnóstico", Toast.LENGTH_SHORT).show();
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public interface multiChoiceListDialogListener
-    {
-        public void onOkay(ArrayList<Integer>arrayList);
+    public interface multiChoiceListDialogListener {
+        public void onOkay(ArrayList<Integer> arrayList);
+
         public void onCancel();
     }
 
-    public void preencherAtividade(Paciente p)
-    {
+    public void preencherAtividade(Paciente p) {
         textViewNome.setText(p.getNome());
-        textViewTelefone.setText("Tlf:" +p.getTelefone());
+        textViewTelefone.setText("Tlf:" + p.getTelefone());
         imagemProfile.setImageBitmap(imagemPaciente);
     }
 
-    public void procuraPaciente()
-    {
+    public void procuraPaciente() {
         dialogPacientes = new Dialog(NovoEpisodioClinico.this);
         dialogPacientes.setContentView(R.layout.dialog_procura_paciente);
         dialogPacientes.setTitle("Escolha o Paciente:");
@@ -168,11 +211,11 @@ public class NovoEpisodioClinico extends ActionBarActivity{
         });
         listaViewPacientes = (ListView) dialogPacientes.findViewById(R.id.listView_ProcuraPacientes);
 
-         listaViewPacientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listaViewPacientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 paciente = (Paciente) listaViewPacientes.getAdapter().getItem(position);
-                new GetImage().execute(paciente.getId()+"");
+                new GetImage().execute(paciente.getId() + "");
             }
         });
 
@@ -180,27 +223,27 @@ public class NovoEpisodioClinico extends ActionBarActivity{
         dialogPacientes.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if(paciente.getId()==0)
-                finish();
+                if (paciente.getId() == 0)
+                    finish();
             }
         });
     }
 
-    public void procuraSintomas()
-    {
+    public void procuraSintomas() {
         AlertDialog dialog;
         final CharSequence[] items = new CharSequence[listaSintomaDialog.size()];
 
-        for(int i=0; i<listaSintomaDialog.size(); i++)
-        {
-            items[i]=listaSintomaDialog.get(i).toString();
+        for (int i = 0; i < listaSintomaDialog.size(); i++) {
+            items[i] = listaSintomaDialog.get(i).toString();
         }
-
-
-
+        listaSintomasEpisodioTemp = new ArrayList<Sintoma>();
+        for (int i = 0; i < listaSintomasEpisodio.size(); i++)
+            listaSintomasEpisodioTemp.add(listaSintomasEpisodio.get(i));
+        for (int i = 0; i < listaSintomaDialog.size(); i++)
+            isSelectedArrayTemp[i] = isSelectedArray[i];
 
         // arraylist to keep the selected items
-        final ArrayList seletedItems=new ArrayList();
+        final ArrayList seletedItems = new ArrayList();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Escolha o(s) Sintomas");
@@ -210,37 +253,22 @@ public class NovoEpisodioClinico extends ActionBarActivity{
                     @Override
                     public void onClick(DialogInterface dialog, int indexSelected,
                                         boolean isChecked) {
-                        if(listaSintomasEpisodio.size()<13){
-                            if(isChecked) {
-                                Toast.makeText(getApplicationContext(), "check", Toast.LENGTH_SHORT).show();
-                                listaSintomasEpisodio.add(listaSintomaDialog.get(indexSelected));
-                                isSelectedArray[indexSelected] = true;
-                            }
-                            else {
-                                Toast.makeText(getApplicationContext(), "Ncheck", Toast.LENGTH_SHORT).show();
-                                listaSintomasEpisodio.remove(listaSintomaDialog.get(indexSelected));
+                        int conta = 0;
+                        for (int i = 0; i < listaSintomaDialog.size(); i++)
+                            if (isSelectedArray[i] == true)
+                                conta += 1;
+
+                        if (isChecked) {
+                            if (conta > 11) {
+                                ((AlertDialog) dialog).getListView().setItemChecked(indexSelected, false);
                                 isSelectedArray[indexSelected] = false;
+                                Toast.makeText(getApplicationContext(), "Selecione apenas 11 Elementos", Toast.LENGTH_SHORT).show();
                             }
-                        }
-                        else
-
-                            Toast.makeText(getApplicationContext(),"Máximo 11 Sintomas", Toast.LENGTH_SHORT).show();
-
-                      /*  if (isChecked) {
-                            // If the user checked the item, add it to the selected items
-                            // write your code when user checked the checkbox
-                            if(listaSintomasEpisodio.size()<12){
-                            seletedItems.add(indexSelected);
-                            isSelectedArray[indexSelected] = true;
-                            listaSintomasEpisodio.add(listaSintomaDialog.get(indexSelected));}
-
                         } else {
-                            // Else, if the item is already in the array, remove it
-                            // write your code when user Uchecked the checkbox
-                            seletedItems.remove(Integer.valueOf(indexSelected));
-                            isSelectedArray[indexSelected] = false;
-                            listaSintomasEpisodio.remove(listaSintomaDialog.get(indexSelected));
-                        }*/
+                            Toast.makeText(getApplicationContext(), "Ncheck", Toast.LENGTH_SHORT).show();
+                        }
+
+
                     }
                 })
                 // Set the action buttons
@@ -248,17 +276,25 @@ public class NovoEpisodioClinico extends ActionBarActivity{
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        adaptadorSintomasEpisodio = new ArrayAdapter<Sintoma>(getApplicationContext(),R.layout.layout_lista_paciente,listaSintomasEpisodio);
+                        listaSintomasEpisodio = new ArrayList<Sintoma>();
+                        for (int i = 0; i < listaSintomaDialog.size(); i++) {
+                            if (isSelectedArray[i] == true)
+                                listaSintomasEpisodio.add(listaSintomaDialog.get(i));
+                        }
+
+
+                        adaptadorSintomasEpisodio = new ArrayAdapter<Sintoma>(getApplicationContext(), R.layout.layout_lista_paciente, listaSintomasEpisodio);
                         listViewSintomasNovoEpisodioClinico.setAdapter(adaptadorSintomasEpisodio);
-                        Toast.makeText(getApplicationContext(),listaSintomasEpisodio.toString(),Toast.LENGTH_LONG).show();
+
 
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        //  Your code when user clicked on Cancel
-
+                        for (int i = 0; i < listaSintomaDialog.size(); i++) {
+                            isSelectedArray[i] = isSelectedArrayTemp[i];
+                        }
                     }
                 });
 
@@ -266,11 +302,10 @@ public class NovoEpisodioClinico extends ActionBarActivity{
         dialog.show();
     }
 
-    public void  preencheLista()
-    {
+    public void preencheLista() {
         adaptadorDialogSintoma = new SintomaAdapter(this, listaSintomaDialog);
         listaSintomas.setAdapter(adaptadorDialogSintoma);
-        Toast.makeText(this,listaSintomaDialog.toString(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, listaSintomaDialog.toString(), Toast.LENGTH_SHORT).show();
         dialogSintomas.show();
     }
 
@@ -327,22 +362,26 @@ public class NovoEpisodioClinico extends ActionBarActivity{
 
 
     }
+
     private class GetImage extends AsyncTask<String, Void, Bitmap> {
 
 
         @Override
         protected void onPreExecute() {
-            ringProgressDialog = new ProgressDialog(NovoEpisodioClinico.this,R.style.NewDialog);
+            ringProgressDialog = new ProgressDialog(NovoEpisodioClinico.this, R.style.NewDialog);
             ringProgressDialog.setCancelable(false);
 
             ringProgressDialog.show();
-        };
+        }
+
+        ;
+
         @Override
         protected Bitmap doInBackground(String... params) {
             Bitmap imagem = null;
 
             try {
-                imagem = WebServiceUtils.getImage(params[0]);
+                imagem = WebServiceUtils.getImage(paciente.getSexo(),paciente.getId()+"");
             } catch (IOException | RestClientException
                     | JSONException e) {
                 e.printStackTrace();
@@ -407,9 +446,10 @@ public class NovoEpisodioClinico extends ActionBarActivity{
                 listaSintomaDialog = lista;
                 //preencheLista();
                 isSelectedArray = new boolean[listaSintomaDialog.size()];
-                for(int i=0; i<listaSintomaDialog.size(); i++)
-                {
+                isSelectedArrayTemp = new boolean[listaSintomaDialog.size()];
+                for (int i = 0; i < listaSintomaDialog.size(); i++) {
                     isSelectedArray[i] = false;
+                    isSelectedArrayTemp[i] = false;
                 }
 
                 /*adaptadorDialogSintoma = new ArrayAdapter<Sintoma>(getApplicationContext(), R.layout.layout_lista_sintomas, listaSintomaDialog);
@@ -432,5 +472,86 @@ public class NovoEpisodioClinico extends ActionBarActivity{
 
     }
 
+    private class GetSistemaPericial extends AsyncTask<String, Void, ArrayList<SistemaPericial>> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(NovoEpisodioClinico.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<SistemaPericial> doInBackground(String... params) {
+            ArrayList<SistemaPericial> lista = new ArrayList<SistemaPericial>();
+
+
+            try {
+                lista = WebServiceUtils.getSistemaPericial(token, listaSintomasEpisodio);
+            } catch (IOException | RestClientException
+                    | JSONException e) {
+                e.printStackTrace();
+            }
+
+            return lista;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<SistemaPericial> lista) {
+            if (lista != null && lista.size() > 1) {
+                ArrayAdapter<SistemaPericial> adaptador = new ArrayAdapter<SistemaPericial>(getApplicationContext(), R.layout.layout_lista_paciente, lista);
+                listaDiagnosticos.setAdapter(adaptador);
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(),lista.toString(),Toast.LENGTH_SHORT).show();
+
+            } else {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Lista Vazia", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
+
+    private class AddEpisodioClinico extends AsyncTask<String, Void, Boolean> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(NovoEpisodioClinico.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Boolean resultado = false;
+
+            try {
+                resultado = WebServiceUtils.addEpisodioClinico(token, episodioClinico);
+            } catch (IOException | RestClientException
+                    | JSONException e) {
+                e.printStackTrace();
+            }
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado) {
+            if (resultado) {
+                Toast.makeText(getApplicationContext(),"Episódio Adicionado com Sucesso", Toast.LENGTH_SHORT).show();
+                ringProgressDialog.dismiss();
+                finish();
+
+            } else {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Erro Adicionar Episódio - Verifique Token", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
 
 }

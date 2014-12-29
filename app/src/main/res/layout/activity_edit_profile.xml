@@ -139,6 +139,23 @@
                 android:layout_marginLeft="15dp"
                 android:textAlignment="center"
                 android:layout_marginRight="15dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sexo"
+                android:id="@+id/textView_EditProfile_Sexo"
+                android:layout_marginLeft="15dp" />
+
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_EditProfile_Sexo"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="15dp"
+               />
+
         </LinearLayout>
     </ScrollView>
 

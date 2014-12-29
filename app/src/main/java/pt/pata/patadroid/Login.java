@@ -26,25 +26,27 @@ public class Login extends ActionBarActivity {
 
     EditText username;
     EditText password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-         username = (EditText) findViewById(R.id.editText_Login_Username);
-         password = (EditText) findViewById(R.id.editText_Login_Password);
+        username = (EditText) findViewById(R.id.editText_Login_Username);
+        password = (EditText) findViewById(R.id.editText_Login_Password);
 
 
         Button btn_login = (Button) findViewById(R.id.button_Login_Login);
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new LogInWeb().execute(username.getText().toString().trim(),password.getText().toString().trim());
+                new LogInWeb().execute(username.getText().toString().trim(), password.getText().toString().trim());
             }
         });
 
         String token = PreferenceManager.getDefaultSharedPreferences(this).getString("token", "defaultStringIfNothingFound");
-        new IsLoggedIN().execute(token);
+        if (!token.equals("defaultStringIfNothingFound"))
+            new IsLoggedIN().execute(token);
 
     }
 
@@ -52,7 +54,7 @@ public class Login extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-       // getMenuInflater().inflate(R.menu.menu_login, menu);
+        // getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -64,21 +66,29 @@ public class Login extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private class LogInWeb extends AsyncTask<String, Void, String> {
 
 
         @Override
         protected void onPreExecute() {
-            ringProgressDialog = new ProgressDialog(Login.this,R.style.NewDialog);
+            ringProgressDialog = new ProgressDialog(Login.this, R.style.NewDialog);
             ringProgressDialog.setCancelable(false);
+            PreferenceManager
+                    .getDefaultSharedPreferences(
+                            getApplicationContext())
+                    .edit().clear().commit();
 
             //ringProgressDialog = ProgressDialog.show(Login.this, "Please wait ...",	"Loging in...", true);
 
             //  ringProgressDialog.setCancelable(false);
 
 
-             ringProgressDialog.show();
-        };
+            ringProgressDialog.show();
+        }
+
+        ;
+
         @Override
         protected String doInBackground(String... params) {
             String token = "";
@@ -101,18 +111,16 @@ public class Login extends ActionBarActivity {
                     ringProgressDialog.dismiss();
                     token = token.replace("\"", "");
                     PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("token", token).commit();
-                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
-                    Toast.makeText(getApplicationContext(), token, Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
+                    new IsAdmin().execute(token);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Erro Utilizador/Password", Toast.LENGTH_SHORT).show();
                     ringProgressDialog.dismiss();
 
 
                 }
             } else {
-                Toast.makeText(getApplicationContext(),"Erro Utilizador/Password",Toast.LENGTH_SHORT).show();
-               ringProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Erro Utilizador/Password", Toast.LENGTH_SHORT).show();
+                ringProgressDialog.dismiss();
 
             }
         }
@@ -123,18 +131,21 @@ public class Login extends ActionBarActivity {
 
         @Override
         protected void onPreExecute() {
-            ringProgressDialog = new ProgressDialog(Login.this,R.style.NewDialog);
+            ringProgressDialog = new ProgressDialog(Login.this, R.style.NewDialog);
             ringProgressDialog.setCancelable(false);
             ringProgressDialog.show();
 
-        };
+        }
+
+        ;
+
         @Override
         protected Boolean doInBackground(String... params) {
-            Boolean resultado= false;
+            Boolean resultado = false;
 
             try {
                 resultado = WebServiceUtils.isLoggedIn(params[0]);
-            } catch ( IOException | RestClientException e) {
+            } catch (IOException | RestClientException e) {
                 e.printStackTrace();
             }
 
@@ -155,6 +166,57 @@ public class Login extends ActionBarActivity {
                 startActivity(equipa);
             } else {
                 Toast.makeText(getApplicationContext(), "Sessão expirada!", Toast.LENGTH_SHORT).show();
+                PreferenceManager
+                        .getDefaultSharedPreferences(
+                                getApplicationContext())
+                        .edit().clear().commit();
+                ringProgressDialog.dismiss();
+
+
+            }
+        }
+    }
+
+    private class IsAdmin extends AsyncTask<String, Void, Boolean> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(Login.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+
+        }
+
+        ;
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Boolean resultado = false;
+
+            try {
+                resultado = WebServiceUtils.isAdmin(params[0]);
+            } catch (IOException | RestClientException e) {
+                e.printStackTrace();
+            }
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado) {
+            if (!resultado) {
+                ringProgressDialog.dismiss();
+                username.setText("");
+                password.setText("");
+                username.requestFocus();
+                username.setHint("Username... ");
+                password.setHint("Password... ");
+
+
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            } else {
+                Toast.makeText(getApplicationContext(), "Apenas Disponivel para Terapeutas", Toast.LENGTH_SHORT).show();
                 PreferenceManager
                         .getDefaultSharedPreferences(
                                 getApplicationContext())

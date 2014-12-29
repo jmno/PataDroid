@@ -10,8 +10,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -19,6 +21,7 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
@@ -34,6 +37,7 @@ public class EditProfile extends ActionBarActivity {
     private EditText nome;
     private EditText morada;
     private EditText telefone;
+    private Spinner spinner_sexo;
     private String token;
     private int mYear, mMonth, mDay;
 
@@ -54,6 +58,12 @@ public class EditProfile extends ActionBarActivity {
         nome = (EditText) findViewById(R.id.editText_EditProfile_nome);
         cc = (EditText) findViewById(R.id.editText_EditProfile_CC);
         data = (EditText) findViewById(R.id.editText_EditProfile_Data);
+        spinner_sexo = (Spinner) findViewById(R.id.spinner_EditProfile_Sexo);
+        ArrayList<String> listaSexos = new ArrayList<>();
+        listaSexos.add("H");
+        listaSexos.add("M");
+        ArrayAdapter<String> adaptadorSexo = new ArrayAdapter<String>(getApplicationContext(),R.layout.layout_lista_paciente,listaSexos);
+        spinner_sexo.setAdapter(adaptadorSexo);
         data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +105,7 @@ public class EditProfile extends ActionBarActivity {
         if (extras != null) {
             this.setTitle("Editar Profile");
             paciente = new Paciente();
-            paciente = (Paciente) extras.get("paciente");
+            paciente =  g.fromJson(extras.getString("paciente"),Paciente.class);
             preencherAtividade(paciente);
         } else {
             this.setTitle("Novo Profile");
@@ -111,6 +121,11 @@ public class EditProfile extends ActionBarActivity {
         cc.setText(p.getCc());
         morada.setText(p.getMorada());
         telefone.setText(p.getTelefone());
+
+        if(p.getSexo().toLowerCase().equals("h"))
+        spinner_sexo.setSelection(0);
+        else
+            spinner_sexo.setSelection(1);
     }
 
     @Override
@@ -137,6 +152,7 @@ public class EditProfile extends ActionBarActivity {
                         paciente.setDataNasc(data.getText().toString());
                         paciente.setNome(nome.getText().toString());
                         paciente.setMorada(morada.getText().toString());
+                        paciente.setSexo((String)spinner_sexo.getSelectedItem());
                         new AddPaciente().execute(token);
                     } else {
                         Toast.makeText(getApplicationContext(), "Preencha Todos os Campos", Toast.LENGTH_SHORT).show();
@@ -149,6 +165,7 @@ public class EditProfile extends ActionBarActivity {
                         paciente.setDataNasc(data.getText().toString());
                         paciente.setNome(nome.getText().toString());
                         paciente.setMorada(morada.getText().toString());
+                        paciente.setSexo((String) spinner_sexo.getSelectedItem());
                         new EditPaciente().execute(token);
                     } else {
                         Toast.makeText(getApplicationContext(), "Preencha Todos os Campos", Toast.LENGTH_SHORT).show();
@@ -246,7 +263,7 @@ public class EditProfile extends ActionBarActivity {
                 Toast.makeText(getApplicationContext(), "Paciente Alterado com Sucesso", Toast.LENGTH_SHORT).show();
 
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra("paciente",paciente);
+                resultIntent.putExtra("paciente",g.toJson(paciente,Paciente.class));
                 setResult(RESULT_OK,resultIntent);
                 finish();
 

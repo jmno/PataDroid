@@ -3,5 +3,7 @@
     android:id="@+id/tv"
     android:textColor="#000000"
     android:layout_width="fill_parent"
+    android:textStyle="bold|italic"
+    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
     android:gravity="center"
     android:layout_height="fill_parent"/>
