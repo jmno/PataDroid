@@ -1,20 +1,15 @@
 package pt.pata.patadroid;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import org.json.JSONException;
 
@@ -22,46 +17,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.Sintoma;
 import pt.pata.patadroid.webutils.RestClientException;
 import pt.pata.patadroid.webutils.WebServiceUtils;
 
 
-public class Pacientes extends ActionBarActivity {
-
+public class ListaSintomas extends ActionBarActivity {
     private String token;
-    private ArrayList<Paciente> listaPacientes;
-    private ListView listaViewPacientes;
+    private ArrayList<Sintoma> listaSintomas;
+    private ListView listaViewSintomas;
     ProgressDialog ringProgressDialog = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pacientes);
+        setContentView(R.layout.activity_lista_sintomas);
 
         token = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 "token", "defaultStringIfNothingFound");
-        listaViewPacientes = (ListView) findViewById(R.id.listView_Pacientes_list);
-        listaViewPacientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Paciente p = (Paciente) listaViewPacientes.getAdapter().getItem(position);
-                Gson g = new Gson();
-                Intent profile = new Intent(getApplicationContext(), Profile.class);
-                profile.putExtra("paciente", g.toJson(p, Paciente.class));
-                startActivity(profile);
-            }
-        });
+        listaViewSintomas = (ListView) findViewById(R.id.listView_ListaSintomas_list);
 
 
-        new GetPacientes().execute(token);
+        new GetSintomas().execute(token);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.menu_pacientes, menu);
+       // getMenuInflater().inflate(R.menu.menu_lista_sintomas, menu);
         return true;
     }
 
@@ -70,23 +53,22 @@ public class Pacientes extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onRestart() {
-
-        new GetPacientes().execute(token);
-        super.onRestart();
-    }
-
-    private class GetPacientes extends AsyncTask<String, Void, ArrayList<Paciente>> {
+    private class GetSintomas extends AsyncTask<String, Void, ArrayList<Sintoma>> {
 
 
         @Override
         protected void onPreExecute() {
-            ringProgressDialog = new ProgressDialog(Pacientes.this, R.style.NewDialog);
+            ringProgressDialog = new ProgressDialog(ListaSintomas.this, R.style.NewDialog);
             ringProgressDialog.setCancelable(false);
             ringProgressDialog.show();
 
@@ -96,12 +78,12 @@ public class Pacientes extends ActionBarActivity {
         ;
 
         @Override
-        protected ArrayList<Paciente> doInBackground(String... params) {
-            ArrayList<Paciente> lista = new ArrayList<Paciente>();
+        protected ArrayList<Sintoma> doInBackground(String... params) {
+            ArrayList<Sintoma> lista = new ArrayList<Sintoma>();
 
 
             try {
-                lista = WebServiceUtils.getAllPacientes(params[0]);
+                lista = WebServiceUtils.getAllSintomas(params[0]);
             } catch (IOException | RestClientException
                     | JSONException e) {
                 e.printStackTrace();
@@ -111,21 +93,20 @@ public class Pacientes extends ActionBarActivity {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Paciente> lista) {
+        protected void onPostExecute(ArrayList<Sintoma> lista) {
             if (lista != null && lista.size() > 1) {
                 ringProgressDialog.dismiss();
 
-                listaPacientes = lista;
-                ArrayAdapter<Paciente> adaptador = new ArrayAdapter<Paciente>(getApplicationContext(), R.layout.layout_lista_paciente, listaPacientes);
-                adaptador.sort(new Comparator<Paciente>() {
+                listaSintomas = lista;
+                ArrayAdapter<Sintoma> adaptador = new ArrayAdapter<Sintoma>(getApplicationContext(), R.layout.layout_lista_paciente, listaSintomas);
+                adaptador.sort(new Comparator<Sintoma>() {
 
                     @Override
-                    public int compare(Paciente lhs, Paciente rhs) {
+                    public int compare(Sintoma lhs, Sintoma rhs) {
                         return lhs.getNome().toLowerCase().compareTo(rhs.getNome().toLowerCase());
                     }
                 });
-                listaViewPacientes.setAdapter(adaptador);
-                Toast.makeText(getApplicationContext(), lista.toString(), Toast.LENGTH_SHORT).show();
+                listaViewSintomas.setAdapter(adaptador);
 
             } else {
                 ringProgressDialog.dismiss();

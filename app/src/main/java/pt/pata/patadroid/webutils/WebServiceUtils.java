@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import pt.pata.patadroid.pt.pata.patadroid.modelo.EpisodioClinico;
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
+import pt.pata.patadroid.pt.pata.patadroid.modelo.Sintoma;
 
 
 public class WebServiceUtils {
@@ -246,6 +247,37 @@ public class WebServiceUtils {
 
     }
 
+    public static ArrayList<Sintoma> getAllSintomas(String token)
+            throws ClientProtocolException, IOException,
+            JSONException, RestClientException {
+        ArrayList<Sintoma> listaSintomas = null;
+
+        HttpGet request = new HttpGet(URL + "lerSintomasXML?token=" + token);
+        // request.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
+        // "application/json"));
+        request.setHeader("Accept", "Application/JSON");
+        BasicHttpResponse basicHttpResponse = (BasicHttpResponse) client
+                .execute(request);
+
+
+        Gson g = new Gson();
+        if (basicHttpResponse.getStatusLine().getStatusCode() == 200) {
+            listaSintomas = new ArrayList<Sintoma>();
+            Type collectionType = new TypeToken<ArrayList<Sintoma>>() {
+            }.getType();
+            listaSintomas = g.fromJson(
+                    EntityUtils.toString(basicHttpResponse.getEntity()),
+                    collectionType);
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + basicHttpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+        return listaSintomas;
+    }
     public static Boolean isOk(int statusCode) {
         Boolean resultado = false;
 

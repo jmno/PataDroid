@@ -44,7 +44,25 @@ public class Paciente implements Serializable{
     }
 
     public String getDataNasc() {
-        return dataNasc;
+
+        String[] dataPartida = dataNasc.split("/");
+        int dayOfMonth = Integer.parseInt(dataPartida[0]);
+        int monthInt = Integer.parseInt(dataPartida[1]);
+        int year = Integer.parseInt(dataPartida[2]);
+        String day = "";
+        if(dayOfMonth <10)
+            day = "0"+dayOfMonth;
+        else
+            day = dayOfMonth+"";
+
+        String month;
+        if(monthInt <10)
+            month = "0"+monthInt;
+        else
+            month = monthInt+"";
+
+        return (day+"/"+month+"/"+year);
+
     }
 
     public void setDataNasc(String dataNasc) {

@@ -21,7 +21,12 @@
     <string name="edit">Editar</string>
     <string name="save">Guardar</string>
     <string name="novoPaciente">Novo Paciente</string>
-
+    <string name="listaSintomas">Lista Sintomas</string>
     <string name="title_activity_edit_profile">EditProfile</string>
+    <string name="title_activity_lista_pacientes">ListaPacientes</string>
+    <string name="title_activity_lista_sintomas">Lista Sintomas</string>
+    <string name="novoEpisodioClinico">Novo Episódio Clínico</string>
+    <string name="title_activity_novo_episodio_clinico">Novo Episodio Clínico</string>
+    <string name="listaDiagnosticos">Lista Diagnósticos</string>
 
 </resources>

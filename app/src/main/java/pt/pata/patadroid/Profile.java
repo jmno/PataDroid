@@ -1,7 +1,9 @@
 package pt.pata.patadroid;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -10,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,7 +32,7 @@ import pt.pata.patadroid.webutils.RestClientException;
 import pt.pata.patadroid.webutils.WebServiceUtils;
 
 
-public class Profile extends ActionBarActivity {
+public class Profile extends ActionBarActivity  {
 
     private TextView textViewNome;
     private TextView textViewData;
@@ -91,8 +94,8 @@ public class Profile extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 Intent editPro = new Intent(getApplicationContext(),EditProfile.class);
-                editPro.putExtra("paciente",g.toJson(paciente,Paciente.class));
-                startActivity(editPro);
+                editPro.putExtra("paciente",paciente);
+                startActivityForResult(editPro,1);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -116,7 +119,24 @@ public class Profile extends ActionBarActivity {
     public void preencherAtividade(Paciente p)
     {
         textViewNome.setText(p.getNome());
-        textViewData.setText(p.getDataNasc());
+        String data = p.getDataNasc();
+        String[] dataPartida = data.split("/");
+        int dayOfMonth = Integer.parseInt(dataPartida[0]);
+        int monthInt = Integer.parseInt(dataPartida[1]);
+        int year = Integer.parseInt(dataPartida[2]);
+        String day = "";
+        if(dayOfMonth <10)
+            day = "0"+dayOfMonth;
+        else
+            day = dayOfMonth+"";
+
+        String month;
+        if(monthInt <10)
+            month = "0"+monthInt;
+        else
+            month = monthInt+"";
+
+        textViewData.setText(day+"/"+month+"/"+year);
         textViewCC.setText("CC:"+p.getCc());
         textViewMorada.setText(p.getMorada());
         textViewTelefone.setText("Tlf:" +p.getTelefone());

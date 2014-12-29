@@ -14,6 +14,10 @@ public class MainActivity extends ActionBarActivity {
     private String token;
     TextView listaPacientes;
     TextView novoPaciente;
+    TextView listaSintomas;
+    TextView novoEpisodioClinico;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,21 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(new Intent(getApplicationContext(),EditProfile.class));
             }
         });
+        listaSintomas = (TextView) findViewById(R.id.textView_Main_ListaSintomas);
+        listaSintomas.setClickable(true);
+        listaSintomas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),ListaSintomas.class));
+            }
+        });
+        novoEpisodioClinico = (TextView) findViewById(R.id.textView_Main_NovoEpisodioClinico);
+        novoEpisodioClinico.setClickable(true);
+        novoEpisodioClinico.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),NovoEpisodioClinico.class));
+            }});
     }
 
 
@@ -69,6 +88,8 @@ public class MainActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
 
 }

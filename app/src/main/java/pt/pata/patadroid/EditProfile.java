@@ -1,6 +1,6 @@
 package pt.pata.patadroid;
 
-import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import pt.pata.patadroid.pt.pata.patadroid.modelo.Paciente;
 import pt.pata.patadroid.webutils.RestClientException;
@@ -33,6 +35,8 @@ public class EditProfile extends ActionBarActivity {
     private EditText morada;
     private EditText telefone;
     private String token;
+    private int mYear, mMonth, mDay;
+
     Bundle extras;
     ProgressDialog ringProgressDialog = null;
 
@@ -53,7 +57,36 @@ public class EditProfile extends ActionBarActivity {
         data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final Calendar c = Calendar.getInstance();
+                mYear = c.get(Calendar.YEAR);
+                mMonth = c.get(Calendar.MONTH);
+                mDay = c.get(Calendar.DAY_OF_MONTH);
 
+                // Launch Date Picker Dialog
+                DatePickerDialog dpd = new DatePickerDialog(EditProfile.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // Display Selected date in textbox
+                                String day = "";
+                                if(dayOfMonth <10)
+                                    day = "0"+dayOfMonth;
+                                else
+                                    day = dayOfMonth+"";
+
+                                String month;
+                                if((monthOfYear+1) <10)
+                                    month = "0"+(monthOfYear+1);
+                                else
+                                    month = (monthOfYear+1)+"";
+
+                                data.setText(day +"/"+ month
+                                        + "/" + year);
+                            }
+                        }, mYear, mMonth, mDay);
+                dpd.show();
             }
         });
 
@@ -62,7 +95,7 @@ public class EditProfile extends ActionBarActivity {
         if (extras != null) {
             this.setTitle("Editar Profile");
             paciente = new Paciente();
-            paciente = g.fromJson(extras.getString("paciente"), Paciente.class);
+            paciente = (Paciente) extras.get("paciente");
             preencherAtividade(paciente);
         } else {
             this.setTitle("Novo Profile");
@@ -212,11 +245,11 @@ public class EditProfile extends ActionBarActivity {
 
                 Toast.makeText(getApplicationContext(), "Paciente Alterado com Sucesso", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent();
-                intent.putExtra("paciente", paciente);
-                setResult(Activity.RESULT_OK, intent);
-
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("paciente",paciente);
+                setResult(RESULT_OK,resultIntent);
                 finish();
+
 
             } else {
                 ringProgressDialog.dismiss();
