@@ -409,6 +409,60 @@ public class WebServiceUtils {
 
         return resultado;
     }
+
+
+    public static Boolean removeTerapeutaFromPaciente(String token, int idPaciente)
+            throws ClientProtocolException, IOException, RestClientException,
+            JSONException {
+        Boolean resultado = false;
+
+        HttpPost httpPost = new HttpPost(URL + "removeTerapeutaFromPaciente?token=" + token+"&idPaciente="+idPaciente+"");
+
+        BasicHttpResponse httpResponse = (BasicHttpResponse) client
+                .execute(httpPost);
+        HttpEntity entity = httpResponse.getEntity();
+        String result = EntityUtils.toString(entity);
+        Log.i("error", result);
+
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+
+            resultado = Boolean.valueOf(result);
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + httpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+        return resultado;
+
+    }
+
+    public static String getNomeTerapeuta(String token)
+            throws ClientProtocolException, IOException, RestClientException {
+        String resultado = "";
+
+        HttpGet request = new HttpGet(URL + "getNomeTerapeuta?token=" + token);
+        request.setHeader("Accept", "Application/JSON");
+        BasicHttpResponse basicHttpResponse = (BasicHttpResponse) client
+                .execute(request);
+
+        if (basicHttpResponse.getStatusLine().getStatusCode() == 200) {
+            resultado =
+                    EntityUtils.toString(basicHttpResponse.getEntity());
+
+        } else {
+            throw new RestClientException(
+                    "HTTP Response with invalid status code "
+                            + basicHttpResponse.getStatusLine().getStatusCode()
+                            + ".");
+        }
+
+        return resultado;
+
+    }
+
     public static Boolean isOk(int statusCode) {
         Boolean resultado = false;
 

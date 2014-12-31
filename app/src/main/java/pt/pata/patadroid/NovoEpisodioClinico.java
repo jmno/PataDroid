@@ -4,13 +4,21 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +32,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import org.json.JSONException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -60,6 +79,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
     private SistemaPericial diagnostico;
     private String diagnosticoString = "";
     private EpisodioClinico episodioClinico;
+    private ArrayList<SistemaPericial> listaDiagnosticosClasse;
 
     private ImageView novoSintoma;
 
@@ -100,6 +120,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 textView_NovoEpisodio_tratamento.setText("");
+
                 new GetSistemaPericial().execute();
             }
         });
@@ -341,7 +362,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(ArrayList<Paciente> lista) {
-            if (lista != null && lista.size() > 1) {
+            if (lista != null && lista.size() > 0) {
                 ringProgressDialog.dismiss();
 
                 adaptadorPacientes = new ArrayAdapter<Paciente>(getApplicationContext(), R.layout.layout_lista_paciente, lista);
@@ -402,7 +423,8 @@ public class NovoEpisodioClinico extends ActionBarActivity {
             } else {
                 ringProgressDialog.dismiss();
                 dialogPacientes.dismiss();
-
+                imagemPaciente = BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                        R.drawable.ic_user);
                 preencherAtividade(paciente);
                 new GetAllSintomas().execute(token);
             }
@@ -440,7 +462,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(ArrayList<Sintoma> lista) {
-            if (lista != null && lista.size() > 1) {
+            if (lista != null && lista.size() > 0) {
                 ringProgressDialog.dismiss();
 
                 listaSintomaDialog = lista;
@@ -465,7 +487,8 @@ public class NovoEpisodioClinico extends ActionBarActivity {
 
             } else {
                 ringProgressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), "Lista Vazia", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Lista Sintomas Vazia", Toast.LENGTH_SHORT).show();
+                //finish();
             }
         }
 
@@ -499,7 +522,9 @@ public class NovoEpisodioClinico extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(ArrayList<SistemaPericial> lista) {
-            if (lista != null && lista.size() > 1) {
+            if (lista != null && lista.size() > 0) {
+                listaDiagnosticosClasse = new ArrayList<SistemaPericial>();
+                listaDiagnosticosClasse =lista;
                 ArrayAdapter<SistemaPericial> adaptador = new ArrayAdapter<SistemaPericial>(getApplicationContext(), R.layout.layout_lista_paciente, lista);
                 listaDiagnosticos.setAdapter(adaptador);
                 ringProgressDialog.dismiss();
@@ -543,6 +568,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
             if (resultado) {
                 Toast.makeText(getApplicationContext(),"Episódio Adicionado com Sucesso", Toast.LENGTH_SHORT).show();
                 ringProgressDialog.dismiss();
+                createPDF();
                 finish();
 
             } else {
@@ -552,6 +578,183 @@ public class NovoEpisodioClinico extends ActionBarActivity {
         }
 
 
+    }
+
+
+
+    public void createPDF()
+    {
+        com.itextpdf.text.Document doc = new Document();
+
+        try {
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDF";
+
+            File dir = new File(path);
+            if(!dir.exists())
+                dir.mkdirs();
+
+            Log.d("PDFCreator", "PDF Path: " + path);
+            String data = episodioClinico.getData().replace("/","");
+            File file = new File(dir,episodioClinico.getIdPaciente() + "_"+data+".pdf");
+            FileOutputStream fOut = new FileOutputStream(file);
+
+            PdfWriter.getInstance(doc, fOut);
+
+            //open the document
+            doc.open();
+
+   /* Create Paragraph and Set Font */
+            Paragraph p1 = new Paragraph("Episódio Clínico:  " + data, FontFactory.getFont(FontFactory.defaultEncoding, Font.DEFAULTSIZE, Font.BOLDITALIC));
+
+            p1.setAlignment(Paragraph.ALIGN_LEFT);
+
+            doc.add(p1);
+
+            Paragraph enter = new Paragraph(" ");
+
+            doc.add(enter);
+
+
+   /* Inserting Image in PDF */
+
+
+            try {
+                // get input stream
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                Bitmap b = getRoundedShape(imagemPaciente);
+                b.compress(Bitmap.CompressFormat.JPEG, 100 , stream);
+                Image image = Image.getInstance(stream.toByteArray());
+                image.setAlignment(Image.ALIGN_LEFT);
+                doc.add(image);
+            }
+            catch(IOException ex)
+            {
+                return;
+            }
+            Paragraph nome = new Paragraph(paciente.getNome());
+            nome.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(nome);
+
+            Paragraph dataN = new Paragraph(paciente.getDataNasc());
+            dataN.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(dataN);
+
+            Paragraph cc = new Paragraph("CC " + paciente.getCc());
+            cc.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(cc);
+
+            Paragraph morada = new Paragraph(paciente.getMorada());
+            morada.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(morada);
+
+            Paragraph tel = new Paragraph("Tel. " + paciente.getTelefone());
+            tel.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(tel);
+
+
+            doc.add(enter);
+            doc.add(enter);
+            doc.add(enter);
+
+            Paragraph listaSintomas = new Paragraph("Lista de Sintomas:", FontFactory.getFont(FontFactory.defaultEncoding, Font.DEFAULTSIZE, Font.BOLDITALIC));
+            listaSintomas.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(listaSintomas);
+
+            for(int i = 0; i<listaSintomasEpisodio.size(); i++)
+            {
+                Paragraph s = new Paragraph(listaSintomasEpisodio.get(i).getNome());
+                s.setAlignment(Paragraph.ALIGN_LEFT);
+                doc.add(s);
+            }
+
+            doc.add(enter);
+            doc.add(enter);
+            doc.add(enter);
+
+            Paragraph listaDiag = new Paragraph("Lista de Diagnósticos:", FontFactory.getFont(FontFactory.defaultEncoding, Font.DEFAULTSIZE, Font.BOLDITALIC));
+            listaDiag.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(listaDiag);
+
+            for(int i = 0; i<listaDiagnosticosClasse.size(); i++)
+            {
+                if(listaDiagnosticosClasse.get(i).getTratamento().equals(textView_NovoEpisodio_tratamento.getText().toString())){
+                    Paragraph s = new Paragraph(listaDiagnosticosClasse.get(i).getDiagnostico(), FontFactory.getFont(FontFactory.defaultEncoding, Font.DEFAULTSIZE, Font.UNDERLINE));
+                    s.setAlignment(Paragraph.ALIGN_LEFT);
+                    doc.add(s);
+                }
+                else{
+                    Paragraph s = new Paragraph(listaDiagnosticosClasse.get(i).getDiagnostico());
+                    s.setAlignment(Paragraph.ALIGN_LEFT);
+                    doc.add(s);
+                }
+
+            }
+
+            doc.add(enter);
+            doc.add(enter);
+            doc.add(enter);
+
+            Paragraph tratamento = new Paragraph("Tratamento:", FontFactory.getFont(FontFactory.defaultEncoding, Font.DEFAULTSIZE, Font.BOLDITALIC));
+            tratamento.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(tratamento);
+
+            Paragraph tratamentoEscolhido = new Paragraph(textView_NovoEpisodio_tratamento.getText().toString());
+            tratamentoEscolhido.setAlignment(Paragraph.ALIGN_LEFT);
+            doc.add(tratamentoEscolhido);
+
+
+
+
+            //add image to document
+
+
+            Toast.makeText(getApplicationContext(), "Created...", Toast.LENGTH_LONG).show();
+
+        } catch (DocumentException de) {
+            Log.e("PDFCreator", "DocumentException:" + de);
+        } catch (IOException e) {
+            Log.e("PDFCreator", "ioException:" + e);
+        }
+        finally
+        {
+            doc.close();
+            openPdf();
+        }
+    }
+
+    void openPdf()
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDF";
+        String data = episodioClinico.getData().replace("/","");
+
+        File file = new File(path, episodioClinico.getIdPaciente() + "_"+data+".pdf");
+
+        intent.setDataAndType( Uri.fromFile(file), "application/pdf" );
+        startActivity(intent);
+    }
+
+    public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+        int targetWidth = 50;
+        int targetHeight = 50;
+        Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+                targetHeight,Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(targetBitmap);
+        Path path = new Path();
+        path.addCircle(((float) targetWidth - 1) / 2,
+                ((float) targetHeight - 1) / 2,
+                (Math.min(((float) targetWidth),
+                        ((float) targetHeight)) / 2),
+                Path.Direction.CCW);
+
+        canvas.clipPath(path);
+        Bitmap sourceBitmap = scaleBitmapImage;
+        canvas.drawBitmap(sourceBitmap,
+                new Rect(0, 0, sourceBitmap.getWidth(),
+                        sourceBitmap.getHeight()),
+                new Rect(0, 0, targetWidth, targetHeight), null);
+        return targetBitmap;
     }
 
 }

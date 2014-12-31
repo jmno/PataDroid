@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -77,7 +78,7 @@ public class Profile extends ActionBarActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -89,11 +90,23 @@ public class Profile extends ActionBarActivity  {
         int id = item.getItemId();
 
         switch (item.getItemId()) {
+            case R.id.action_gps:
+                String uri = "geo:0,0?q="+paciente.getMorada();
+                startActivity(new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri)));
+                return true;
+            case R.id.action_call:
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+paciente.getTelefone().trim())));
+                return true;
             case R.id.action_edit:
                 Gson g = new Gson();
                 Intent editPro = new Intent(getApplicationContext(),EditProfile.class);
                 editPro.putExtra("paciente",g.toJson(paciente,Paciente.class));
                 startActivityForResult(editPro,1);
+                return true;
+
+            case R.id.action_remove:
+                new RemoveTerapeutaFromPaciente().execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -201,7 +214,7 @@ public class Profile extends ActionBarActivity  {
 
         @Override
         protected void onPostExecute(ArrayList<EpisodioClinico> lista) {
-            if (lista != null && lista.size()>1) {
+            if (lista != null && lista.size()>0) {
                 paciente.setListaEpisodios(lista);
 
                 ArrayAdapter<EpisodioClinico> adaptador = new ArrayAdapter<EpisodioClinico>(getApplicationContext(),R.layout.layout_lista_paciente,lista);
@@ -216,5 +229,44 @@ public class Profile extends ActionBarActivity  {
 
             }
         }
+    }
+    private class RemoveTerapeutaFromPaciente extends AsyncTask<String, Void, Boolean> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(Profile.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            Boolean resultado = false;
+
+            try {
+                resultado = WebServiceUtils.removeTerapeutaFromPaciente(token, paciente.getId());
+            } catch (IOException | RestClientException
+                    | JSONException e) {
+                e.printStackTrace();
+            }
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean resultado) {
+            if (resultado) {
+                Toast.makeText(getApplicationContext(),"Associação Removida com Sucesso", Toast.LENGTH_SHORT).show();
+                ringProgressDialog.dismiss();
+                finish();
+
+            } else {
+                ringProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Associação Não Removida - Verifique Token", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
     }
 }

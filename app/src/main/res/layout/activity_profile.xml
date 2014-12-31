@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="pt.pata.patadroid.Profile"
     android:background="#EEEEEE">
@@ -9,11 +10,10 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:background="#1E9BDD">
+        android:background="#1E9BDD"
+        android:gravity="center_horizontal">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/profile_image"
             android:layout_width="96dp"
             android:layout_height="96dp"
@@ -22,7 +22,8 @@
             app:border_color="#FF000000"
             android:layout_marginTop="15dp" />
 
-        <TextView  android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
             android:id="@+id/textView_Profile_nome"
@@ -38,77 +39,94 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:layout_marginTop="15dp">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_weight="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dados"
-            android:id="@+id/textView"
-            android:layout_marginRight="15dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="#EEEEEE"
             android:layout_marginTop="15dp"
-            android:textStyle="bold|italic"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_marginLeft="15dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/morada"
-            android:id="@+id/textView_Profile_morada"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="15dp"
-            android:layout_marginLeft="15dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cc"
-            android:id="@+id/textView_Profile_cc"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="15dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/telefone"
-            android:id="@+id/textView_Profile_telefone"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="15dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/episodiosClinico"
-            android:id="@+id/textView_Profile_ListaEpisodios"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
-            android:textStyle="bold|italic"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_marginLeft="15dp" />
-
-        <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/listView_Profile_listaEpisodiosClinicos"
-            android:layout_marginTop="10dp"
-            android:background="#FFFFFF"
-            android:layout_marginLeft="15dp" />
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dados"
+                    android:id="@+id/textView"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:textStyle="bold|italic"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_marginLeft="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/morada"
+                    android:id="@+id/textView_Profile_morada"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cc"
+                    android:id="@+id/textView_Profile_cc"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/telefone"
+                    android:id="@+id/textView_Profile_telefone"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="15dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:minHeight="200dp"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/episodiosClinico"
+                    android:id="@+id/textView_Profile_ListaEpisodios"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:textStyle="bold|italic"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_marginLeft="15dp" />
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="173dp"
+                    android:id="@+id/listView_Profile_listaEpisodiosClinicos"
+                    android:layout_marginTop="10dp"
+                    android:background="#FFFFFF"
+                    android:layout_marginLeft="15dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
 
 </LinearLayout>

@@ -94,7 +94,7 @@ public class ListaSintomas extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(ArrayList<Sintoma> lista) {
-            if (lista != null && lista.size() > 1) {
+            if (lista != null && lista.size() > 0) {
                 ringProgressDialog.dismiss();
 
                 listaSintomas = lista;

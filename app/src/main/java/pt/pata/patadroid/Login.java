@@ -26,6 +26,7 @@ public class Login extends ActionBarActivity {
 
     EditText username;
     EditText password;
+    private String tokenSessao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,7 @@ public class Login extends ActionBarActivity {
 
                     ringProgressDialog.dismiss();
                     token = token.replace("\"", "");
+                    tokenSessao = token;
                     PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("token", token).commit();
                     new IsAdmin().execute(token);
                 } else {
@@ -213,10 +215,55 @@ public class Login extends ActionBarActivity {
                 username.setHint("Username... ");
                 password.setHint("Password... ");
 
+                new GetTerapeutaNome().execute(tokenSessao);
 
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else {
                 Toast.makeText(getApplicationContext(), "Apenas Disponivel para Terapeutas", Toast.LENGTH_SHORT).show();
+                PreferenceManager
+                        .getDefaultSharedPreferences(
+                                getApplicationContext())
+                        .edit().clear().commit();
+                ringProgressDialog.dismiss();
+
+
+            }
+        }
+    }
+    private class GetTerapeutaNome extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            ringProgressDialog = new ProgressDialog(Login.this, R.style.NewDialog);
+            ringProgressDialog.setCancelable(false);
+            ringProgressDialog.show();
+
+        }
+
+        ;
+
+        @Override
+        protected String doInBackground(String... params) {
+            String resultado = "";
+
+            try {
+                resultado = WebServiceUtils.getNomeTerapeuta(params[0]);
+            } catch (IOException | RestClientException e) {
+                e.printStackTrace();
+            }
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(String resultado) {
+            if (!resultado.trim().equals("")) {
+                ringProgressDialog.dismiss();
+                resultado = resultado.replace("\"", "");
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("nomeTerapeuta", resultado).commit();
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            } else {
+                Toast.makeText(getApplicationContext(), "Erro Get Nome Terapeut", Toast.LENGTH_SHORT).show();
                 PreferenceManager
                         .getDefaultSharedPreferences(
                                 getApplicationContext())

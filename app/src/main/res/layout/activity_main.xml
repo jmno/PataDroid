@@ -5,73 +5,96 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="pt.pata.patadroid.MainActivity"
-    android:gravity="center|center_vertical|center_horizontal">
+    tools:context="pt.pata.patadroid.MainActivity">
 
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:id="@+id/textView_Main_NomeTerapeuta"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="10dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView_Main_Lista_Pacientes"
-            android:text="Lista Pacientes"
-            android:textStyle="bold|italic"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textAlignment="center"
-            android:layout_marginBottom="25dp"
-            android:gravity="center_horizontal" />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView2"
+        android:fillViewport="true"
+        android:layout_marginTop="10dp">
 
-        <TextView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/novoPaciente"
-            android:id="@+id/textView_Main_Novo_Paciente"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textStyle="bold|italic"
-            android:layout_marginBottom="25dp"
-            android:gravity="center_horizontal" />
+            android:layout_gravity="top|center">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView_Main_ListaSintomas"
-            android:text="@string/listaSintomas"
-            android:textStyle="bold|italic"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textAlignment="center"
-            android:layout_marginBottom="25dp"
-            android:gravity="center_horizontal" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_Main_Lista_Pacientes"
+                android:text="Lista Pacientes"
+                android:textStyle="bold|italic"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:textAlignment="center"
+                android:layout_marginBottom="25dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:drawableLeft="@drawable/ic_listapacientes"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView_Main_NovoEpisodioClinico"
-            android:textStyle="bold|italic"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textAlignment="center"
-            android:layout_marginBottom="25dp"
-            android:gravity="center_horizontal"
-            android:text="@string/novoEpisodioClinico" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/novoPaciente"
+                android:id="@+id/textView_Main_Novo_Paciente"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:textStyle="bold|italic"
+                android:layout_marginBottom="25dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:drawableLeft="@drawable/ic_addpaciente"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView_Main_Logout"
-            android:textStyle="bold|italic"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:textAlignment="center"
-            android:layout_marginBottom="25dp"
-            android:gravity="center_horizontal"
-            android:text="Logout" />
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_Main_ListaSintomas"
+                android:text="@string/listaSintomas"
+                android:textStyle="bold|italic"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:textAlignment="center"
+                android:layout_marginBottom="25dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:drawableLeft="@drawable/ic_listasintomas"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_Main_NovoEpisodioClinico"
+                android:textStyle="bold|italic"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:textAlignment="center"
+                android:layout_marginBottom="25dp"
+                android:text="@string/novoEpisodioClinico"
+                android:gravity="center_horizontal|center_vertical"
+                android:drawableLeft="@drawable/ic_newblack"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_Main_Logout"
+                android:textStyle="bold|italic"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:textAlignment="center"
+                android:gravity="center_horizontal|center_vertical"
+                android:drawableLeft="@drawable/ic_logout"
+                android:text="Logout" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>

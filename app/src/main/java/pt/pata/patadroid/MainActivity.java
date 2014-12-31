@@ -26,6 +26,8 @@ public class MainActivity extends ActionBarActivity {
     TextView listaSintomas;
     TextView novoEpisodioClinico;
     TextView logout;
+    TextView nomeTerapeuta;
+    String nomeTerapeutaString;
     ProgressDialog ringProgressDialog = null;
 
 
@@ -39,7 +41,10 @@ public class MainActivity extends ActionBarActivity {
 
         token = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 "token", "defaultStringIfNothingFound");
-
+        nomeTerapeutaString = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                "nomeTerapeuta", "Unknown");
+        nomeTerapeuta = (TextView) findViewById(R.id.textView_Main_NomeTerapeuta);
+        nomeTerapeuta.setText("Bem Vindo: " + nomeTerapeutaString);
         listaPacientes = (TextView) findViewById(R.id.textView_Main_Lista_Pacientes);
         listaPacientes.setClickable(true);
         listaPacientes.setOnClickListener(new View.OnClickListener() {

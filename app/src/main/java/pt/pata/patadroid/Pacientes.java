@@ -2,16 +2,22 @@ package pt.pata.patadroid;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -32,7 +38,9 @@ public class Pacientes extends ActionBarActivity {
     private String token;
     private ArrayList<Paciente> listaPacientes;
     private ListView listaViewPacientes;
+    private EditText pacientesText;
     ProgressDialog ringProgressDialog = null;
+    private ArrayAdapter<Paciente> adaptadorPacientes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,29 @@ public class Pacientes extends ActionBarActivity {
                 Intent profile = new Intent(getApplicationContext(), Profile.class);
                 profile.putExtra("paciente", g.toJson(p, Paciente.class));
                 startActivity(profile);
+            }
+        });
+
+        pacientesText = (EditText) findViewById(R.id.editText_Pacientes_search);
+        pacientesText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // TODO Auto-generated method stub
+                adaptadorPacientes.getFilter().filter(s);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
             }
         });
 
@@ -112,11 +143,20 @@ public class Pacientes extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(ArrayList<Paciente> lista) {
-            if (lista != null && lista.size() > 1) {
+            if (lista != null && lista.size() > 0) {
                 ringProgressDialog.dismiss();
 
                 listaPacientes = lista;
-                ArrayAdapter<Paciente> adaptador = new ArrayAdapter<Paciente>(getApplicationContext(), R.layout.layout_lista_paciente, listaPacientes);
+                ArrayAdapter<Paciente> adaptador = new ArrayAdapter<Paciente>(getApplicationContext(), android.R.layout.simple_list_item_1, listaPacientes)
+                {
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        View view = super.getView(position, convertView, parent);
+                        TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                        text1.setTextColor(Color.parseColor("#000000"));
+                        return view;
+
+                    };
+                };
                 adaptador.sort(new Comparator<Paciente>() {
 
                     @Override
@@ -124,8 +164,8 @@ public class Pacientes extends ActionBarActivity {
                         return lhs.getNome().toLowerCase().compareTo(rhs.getNome().toLowerCase());
                     }
                 });
+                adaptadorPacientes = adaptador;
                 listaViewPacientes.setAdapter(adaptador);
-                Toast.makeText(getApplicationContext(), lista.toString(), Toast.LENGTH_SHORT).show();
 
             } else {
                 ringProgressDialog.dismiss();

@@ -3,7 +3,9 @@
     package="pt.pata.patadroid" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -20,28 +22,34 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".Pacientes"
-            android:label="@string/title_activity_pacientes" >
+            android:label="@string/title_activity_pacientes"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".Profile"
-            android:label="@string/title_activity_profile" >
+            android:label="@string/title_activity_profile"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".EditProfile"
             android:label="@string/title_activity_edit_profile"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".ListaSintomas"
-            android:label="@string/title_activity_lista_sintomas" >
+            android:label="@string/title_activity_lista_sintomas"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".NovoEpisodioClinico"
-            android:label="@string/title_activity_novo_episodio_clinico" >
+            android:label="@string/title_activity_novo_episodio_clinico"
+            android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
     </application>
 
