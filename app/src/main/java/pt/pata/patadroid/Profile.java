@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -64,6 +66,28 @@ public class Profile extends ActionBarActivity  {
         textViewMorada = (TextView) findViewById(R.id.textView_Profile_morada);
         textViewTelefone = (TextView) findViewById(R.id.textView_Profile_telefone);
         listViewEpisodios = (ListView) findViewById(R.id.listView_Profile_listaEpisodiosClinicos);
+        listViewEpisodios.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
         imagemProfile = (CircleImageView) findViewById(R.id.profile_image);
 
         new GetImage().execute(paciente.getSexo());

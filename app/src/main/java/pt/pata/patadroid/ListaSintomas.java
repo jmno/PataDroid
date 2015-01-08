@@ -111,6 +111,7 @@ public class ListaSintomas extends ActionBarActivity {
             } else {
                 ringProgressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), "Lista Vazia", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
 

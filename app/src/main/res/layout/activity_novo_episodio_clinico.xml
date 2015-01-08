@@ -1,50 +1,54 @@
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="#1E9BDD">
+
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/profile_image_NovoEpisodio"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_user"
+            app:border_width="2dp"
+            app:border_color="#FF000000"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textView_NovoEpisodio_nome"
+            android:textStyle="bold|italic"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_NovoEpisodio_telefone"
+            android:layout_marginBottom="15dp"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
 
     <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:background="#EEEEEE">
+        android:background="#EEEEEE"
+        android:fillViewport="true">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:background="#1E9BDD">
-
-                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/profile_image_NovoEpisodio"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:src="@drawable/ic_user"
-                    app:border_width="2dp"
-                    app:border_color="#FF000000"
-                    android:layout_marginTop="15dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:id="@+id/textView_NovoEpisodio_nome"
-                    android:textStyle="bold|italic"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_NovoEpisodio_telefone"
-                    android:layout_marginBottom="15dp"
-                    android:textColor="#FFFFFF" />
-
-            </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
@@ -76,13 +80,12 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/imageView_NovoEpisodio_novoSintoma"
                         android:src="@drawable/ic_newblack"
-                        android:layout_alignParentRight="true"
-                        android:layout_weight="1" />
+                        android:layout_alignParentRight="true" />
                 </LinearLayout>
 
                 <ListView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="70dp"
                     android:id="@+id/listView_NovoEpisodio_listaSintomas"
                     android:layout_above="@+id/textView_NovoEpisodio_listaSintomas"
                     android:layout_alignParentBottom="true"
@@ -97,7 +100,7 @@
                 android:text="Gerar Diagnósticos"
                 android:id="@+id/button_NovoEpisodio_btnGerarResultados"
                 android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="15dp" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -121,20 +124,13 @@
                         android:textStyle="bold|italic"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_marginLeft="15dp"
-                        android:layout_alignParentTop="true"
-                        android:layout_weight="8" />
+                        android:layout_alignParentTop="true" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/imageView"
-                        android:src="@drawable/ic_newblack"
-                        android:layout_alignParentRight="true" />
                 </LinearLayout>
 
                 <ListView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="80dp"
                     android:id="@+id/listView_NovoEpisodio_listaDiagnosticos"
                     android:layout_above="@+id/textView2"
                     android:layout_alignParentBottom="true"
@@ -169,9 +165,7 @@
                     android:layout_marginBottom="15dp"
                     android:layout_marginLeft="15dp" />
 
-
             </LinearLayout>
         </LinearLayout>
-
-
     </ScrollView>
+</LinearLayout>

@@ -1,7 +1,5 @@
 package pt.pata.patadroid.pt.pata.patadroid.modelo;
 
-import java.util.List;
-
 /**
  * Created by Nicolau on 26/12/14.
  */
@@ -10,7 +8,6 @@ public class EpisodioClinico {
     private String diagnostico;
     private int id;
     private int idPaciente;
-    private List<Sintoma> listaSintomas;
 
     public String getData() {
         return data;
@@ -44,13 +41,6 @@ public class EpisodioClinico {
         this.idPaciente = idPaciente;
     }
 
-    public List<Sintoma> getListaSintomas() {
-        return listaSintomas;
-    }
-
-    public void setListaSintomas(List<Sintoma> listaSintomas) {
-        this.listaSintomas = listaSintomas;
-    }
 
     @Override
     public String toString() {

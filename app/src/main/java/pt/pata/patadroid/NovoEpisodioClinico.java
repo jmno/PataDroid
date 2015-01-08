@@ -21,6 +21,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -111,6 +112,27 @@ public class NovoEpisodioClinico extends ActionBarActivity {
         textViewTelefone = (TextView) findViewById(R.id.textView_NovoEpisodio_telefone);
         imagemProfile = (CircleImageView) findViewById(R.id.profile_image_NovoEpisodio);
         listViewSintomasNovoEpisodioClinico = (ListView) findViewById(R.id.listView_NovoEpisodio_listaSintomas);
+        listViewSintomasNovoEpisodioClinico.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
 
         textView_NovoEpisodio_tratamento = (TextView) findViewById(R.id.textView_NovoEpisodio_tratamentoString);
 
@@ -140,6 +162,28 @@ public class NovoEpisodioClinico extends ActionBarActivity {
                 diagnostico = (SistemaPericial) listaDiagnosticos.getAdapter().getItem(position);
                 textView_NovoEpisodio_tratamento.setText(diagnostico.getTratamento().toString());
                 diagnosticoString = diagnostico.getDiagnostico()+"|"+diagnostico.getTratamento();
+            }
+        });
+
+        listaDiagnosticos.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
             }
         });
 
@@ -177,7 +221,6 @@ public class NovoEpisodioClinico extends ActionBarActivity {
                     episodioClinico.setData(dateFormat.format(date));
                     episodioClinico.setDiagnostico(diagnosticoString);
                     episodioClinico.setIdPaciente(paciente.getId());
-                    episodioClinico.setListaSintomas(listaSintomasEpisodio);
                     new AddEpisodioClinico().execute();
                 }
                 else
@@ -378,6 +421,7 @@ public class NovoEpisodioClinico extends ActionBarActivity {
             } else {
                 ringProgressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), "Lista Vazia", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
 
